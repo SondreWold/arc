@@ -78,7 +78,7 @@ def label_cleaner(dirty_labels):
 
 def find_q(ids:str):
     print(f"Searching for {ids}")
-    dataset = load_dataset("ai2_arc", "ARC-Easy")
+    dataset = load_dataset("ai2_arc", "ARC-Challenge")
     bingo = None
     for i, ele in enumerate(dataset["test"]):
         if ele["id"] == ids:
@@ -89,7 +89,7 @@ def find_q(ids:str):
 
 class ArcDataset(Dataset):
     def __init__(self, split):
-        dataset = load_dataset("ai2_arc", "ARC-Easy")
+        dataset = load_dataset("ai2_arc", "ARC-Challenge")
         
         self.X = dataset[split].map(preprocess_function, batched=False)
         self.input_ids = self.X["input_ids"]
