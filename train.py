@@ -140,14 +140,14 @@ def train():
             
             input_ids = input_ids.to(device)
             attention_masks = attention_masks.to(device)
-            optimiser.zero_grad()
+            optimizer.zero_grad()
             y = torch.LongTensor(y)
             y = y.to(device)
             out = model(input_ids=input_ids, attention_mask=attention_masks, return_dict=True).logits
             loss = criterion(out, y)
             train_loss += loss.item()
             loss.backward()
-            optimiser.step()
+            optimizer.step()
             
 
         model.eval()
