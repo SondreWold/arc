@@ -66,12 +66,12 @@ def label_cleaner(dirty_labels):
         "B": "B",
         "C": "C",
         "D": "D",
-        "E": "E",
+        "E": "A",
         "1": "A",
         "2": "B",
         "3": "C",
         "4": "D",
-        "5": "E"
+        "5": "A"
     }
 
     return [d[k] for k in dirty_labels]
@@ -95,8 +95,8 @@ class ArcDataset(Dataset):
         self.input_ids = self.X["input_ids"]
         self.attention_masks = self.X["attention_mask"]
         self.labels = label_cleaner(list(dataset[split]["answerKey"]))
-        self.label_indexer = {"A":0, "B":1, "C":2, "D":3, "E":4}
-        self.label_inverter = {0:"A", 1:"B" , 2:"C", 3:"D", 4:"E"}
+        self.label_indexer = {"A":0, "B":1, "C":2, "D":3}
+        self.label_inverter = {0:"A", 1:"B" , 2:"C", 3:"D"}
 
         for t in list(self.label_indexer.keys()):
             assert t == self.label_inverter[self.label_indexer[t]]
@@ -109,8 +109,8 @@ class ArcDataset(Dataset):
 
 
 def train():
-    BATCH_SIZE = 32
-    EPOCHS = 5
+    BATCH_SIZE = 16
+    EPOCHS = 3
     train_dataset = ArcDataset("train")
     val_dataset = ArcDataset("validation")
 
@@ -125,6 +125,7 @@ def train():
         model.train()
         train_loss = 0.0
         for i, (input_ids, attention_masks, y) in enumerate(tqdm(train_loader)):
+            
             input_ids = input_ids.to(device)
             attention_masks = attention_masks.to(device)
             optimiser.zero_grad()
@@ -135,6 +136,7 @@ def train():
             train_loss += loss.item()
             loss.backward()
             optimiser.step()
+            
 
         model.eval()
         with torch.no_grad():
