@@ -110,15 +110,27 @@ class ArcDataset(Dataset):
 
 def train():
     BATCH_SIZE = 32
-    EPOCHS = 3
+    EPOCHS = 10
     train_dataset = ArcDataset("train")
     val_dataset = ArcDataset("validation")
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True)
-
     model = AutoModelForMultipleChoice.from_pretrained("allenai/scibert_scivocab_uncased", num_labels=4).to(device)
-    optimiser = AdamW(model.parameters(), lr=3e-5)
+
+    no_decay = ["bias", "LayerNorm.weight"]
+    optimizer_grouped_parameters = [
+        {
+            "params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
+            "weight_decay": 0.01,
+        },
+        {
+            "params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)],
+            "weight_decay": 0.0,
+        },
+    ]
+    optimizer = AdamW(optimizer_grouped_parameters, lr=3e-6)
+
     criterion = CrossEntropyLoss()
 
     for epoch in range(EPOCHS):
