@@ -8,7 +8,7 @@ from torch.utils.data import Dataset, DataLoader
 from tqdm import tqdm
 import numpy as np
 
-tokenizer = AutoTokenizer.from_pretrained("scibert_scivocab_uncased")
+tokenizer = AutoTokenizer.from_pretrained("allenai/scibert_scivocab_uncased")
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def preprocess_function(examples):
@@ -117,7 +117,7 @@ def train():
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    model = AutoModelForMultipleChoice.from_pretrained("scibert_scivocab_uncased", num_labels=4).to(device)
+    model = AutoModelForMultipleChoice.from_pretrained("allenai/scibert_scivocab_uncased", num_labels=4).to(device)
     optimiser = AdamW(model.parameters(), lr=3e-5)
     criterion = CrossEntropyLoss()
 
