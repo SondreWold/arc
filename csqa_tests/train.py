@@ -127,10 +127,9 @@ def main(args):
     val_dataset = CSQADataset("validation", MODEL_NAME)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    model = AutoModelForMultipleChoice.from_pretrained(MODEL_NAME, num_labels=5)
+    model = AutoModelForMultipleChoice.from_pretrained(MODEL_NAME, num_labels=5).to(device)
     criterion = CrossEntropyLoss()
     optimizer = AdamW(model.parameters(), lr=LR)
-
 
     for epoch in range(EPOCHS):
         logging.info(f"Staring training at epoch {epoch}")
