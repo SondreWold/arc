@@ -129,7 +129,14 @@ def main(args):
 
     model = AutoModelForMultipleChoice.from_pretrained(MODEL_NAME, num_labels=5).to(device)
     criterion = CrossEntropyLoss()
-    optimizer = AdamW(model.parameters(), lr=LR)
+    no_decay = ["bias", "LayerNorm.weight"]
+    optimizer_grouped_parameters = [
+        {
+            "params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
+            "weight_decay": 0.001,
+        },
+    ]
+    optimizer = AdamW(optimizer_grouped_parameters, lr=LR)
 
     for epoch in range(EPOCHS):
         logging.info(f"Staring training at epoch {epoch}")
