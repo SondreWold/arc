@@ -94,7 +94,8 @@ def main(args):
         "epochs": EPOCHS,
         "batch_size": BATCH_SIZE,
         "weight_decay": args.weight_decay,
-        "dataset": DATASET_NAME
+        "dataset": DATASET_NAME,
+        "model_name": MODEL_NAME
 
     }
 
