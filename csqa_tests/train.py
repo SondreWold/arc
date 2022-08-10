@@ -184,7 +184,6 @@ def main(args):
             wandb.log({"batch_loss_train": loss})
             loss.backward()
             optimizer.step()
-            break
 
         model.eval()
         with torch.no_grad():
@@ -203,7 +202,6 @@ def main(args):
                 loss = criterion(out, y)
                 val_loss += loss.item()
                 n += 1*BATCH_SIZE
-                break
 
             accuracy = correct / n
 

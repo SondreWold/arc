@@ -1,0 +1,25 @@
+08/10/2022 13:35:19 - WARNING - datasets.builder -   Using custom data configuration default
+08/10/2022 13:35:19 - WARNING - datasets.builder -   Reusing dataset commonsense_qa (/Users/sondrewo/.cache/huggingface/datasets/commonsense_qa/default/1.0.0/28d68f56649a7f0c23bc68eae850af914aa03f95f810011ae8cf58cc5ff5051b)
+08/10/2022 13:35:23 - WARNING - datasets.arrow_dataset -   Loading cached processed dataset at /Users/sondrewo/.cache/huggingface/datasets/commonsense_qa/default/1.0.0/28d68f56649a7f0c23bc68eae850af914aa03f95f810011ae8cf58cc5ff5051b/cache-864e8936c982f263.arrow
+08/10/2022 13:35:24 - WARNING - datasets.builder -   Using custom data configuration default
+08/10/2022 13:35:24 - WARNING - datasets.builder -   Reusing dataset commonsense_qa (/Users/sondrewo/.cache/huggingface/datasets/commonsense_qa/default/1.0.0/28d68f56649a7f0c23bc68eae850af914aa03f95f810011ae8cf58cc5ff5051b)
+08/10/2022 13:35:28 - WARNING - datasets.arrow_dataset -   Loading cached processed dataset at /Users/sondrewo/.cache/huggingface/datasets/commonsense_qa/default/1.0.0/28d68f56649a7f0c23bc68eae850af914aa03f95f810011ae8cf58cc5ff5051b/cache-f4be9a44e7a11574.arrow
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertModel: ['cls.predictions.decoder.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.seq_relationship.bias', 'cls.seq_relationship.weight', 'cls.predictions.transform.dense.bias']
+- This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+08/10/2022 13:35:30 - INFO - root -   Staring training at epoch 0
+  0%|                                                                                                                                                                                                                                  | 0/609 [00:11<?, ?it/s]
+  0%|                                                                                                                                                                                                                                   | 0/77 [00:02<?, ?it/s]
+08/10/2022 13:35:44 - INFO - root -   Staring training at epoch 1
+  0%|                                                                                                                                                                                                                                  | 0/609 [00:00<?, ?it/s]
+  0%|                                                                                                                                                                                                                                  | 0/609 [00:10<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 227, in <module>
+    main(args)
+  File "train.py", line 185, in main
+    loss.backward()
+  File "/Users/sondrewo/Documents/ConceptNet_sandbox/venv/lib/python3.8/site-packages/torch/_tensor.py", line 396, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
+  File "/Users/sondrewo/Documents/ConceptNet_sandbox/venv/lib/python3.8/site-packages/torch/autograd/__init__.py", line 173, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+KeyboardInterrupt
