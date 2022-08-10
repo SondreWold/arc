@@ -120,7 +120,6 @@ def main(args):
         "batch_size": BATCH_SIZE
     }
     wandb.init(project="csqa_test", entity="sondrewo", config=config)
-    wandb.log(config)
     train_dataset = CSQADataset("train", MODEL_NAME)
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
@@ -149,6 +148,7 @@ def main(args):
             y_hat = model(input_ids, attention_masks).logits
             loss = criterion(y_hat, y)
             train_loss += loss.item()
+            wandb.log({"batch_loss_train": loss})
             loss.backward()
             optimizer.step()
 
@@ -174,7 +174,7 @@ def main(args):
         t_l = train_loss / len(train_loader)
         v_l = val_loss / len(val_loader)
         print(f"Epoch {epoch}, avg. train loss: {t_l} avg. val loss: {v_l}. Val. accuracy: {accuracy}")
-        wandb.log({"train_loss": t_l})
+        wandb.log({"train_loss_epoch": t_l})
         wandb.log({"val_loss": v_l})
         wandb.log({"accuracy": accuracy})
 
