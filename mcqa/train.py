@@ -92,7 +92,10 @@ def main(args):
     config = {
         "learning_rate": LR,
         "epochs": EPOCHS,
-        "batch_size": BATCH_SIZE
+        "batch_size": BATCH_SIZE,
+        "weight_decay": args.weight_decay,
+        "dataset": DATASET_NAME
+
     }
 
     if args.debug == False:
@@ -127,9 +130,7 @@ def main(args):
             train_loss += loss.item()
             loss.backward()
             optimizer.step()
-            if args.debug == False:
-                wandb.log({"batch_loss_train": loss})
-            else:
+            if args.debug == True:
                 break
 
         model.eval()
