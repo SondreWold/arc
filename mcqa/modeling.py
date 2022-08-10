@@ -13,7 +13,7 @@ class FusionModel(nn.Module):
         self.encoder = AutoModel.from_pretrained(model_name, return_dict=True, output_hidden_states=True, output_attentions=True)
         self.hidden_size = self.encoder.config.to_dict()['hidden_size']
         self.dropout = nn.Dropout()
-        self.head = nn.Linear(hidden_size, 1)
+        self.head = nn.Linear(self.hidden_size, 1)
         self.use_graph = use_graph
 
         if self.use_graph:
