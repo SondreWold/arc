@@ -2,7 +2,7 @@ import torch
 from datasets import load_dataset
 from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
-from transformers import AutoModelForMultipleChoice, AutoTokenizer, set_seed
+from transformers import AutoModelForMultipleChoice, AutoTokenizer, set_seed, AutoModel
 from torch.optim import AdamW
 from torch.nn import CrossEntropyLoss
 import logging
@@ -12,6 +12,28 @@ import os
 import wandb
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
+class FusionModel(nn.Module):
+
+    def __init__(self, model_name, num_labels: int):
+        super().__init__()
+        self.encoder = AutoModel.from_pretrained(model_name, return_dict=True, output_hidden_states=True, output_attentions=True)
+        self.dropout = nn.Dropout()
+        self.head = nn.Linear(768, 1)
+
+    def forward(self, input_ids, attention_mask):
+        #get the CLS representation from transformer. torch.FloatTensor of shape (batch_size, hidden_size))
+        batch_size, n_choices, seq_length = input_ids.size()[0], input_ids.size()[1], input_ids.size()[-1]
+        input_ids = input_ids.view(-1, seq_length)
+        attention_mask = attention_mask.view(-1, seq_length)
+        pooled_output = self.encoder(input_ids, attention_mask)[1] #expects (batch_size, max_seq, dim) (16, 128, 768)?
+        pooled_output = self.dropout(pooled_output)
+        logits = self.head(pooled_output)
+        reshaped_logits = logits.view(-1, n_choices)
+        return reshaped_logits
+
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -27,7 +49,7 @@ def parse_args():
     parser.add_argument(
     "--model",
     type=str,
-    default="distilbert-base-uncased",
+    default="bert-base-uncased",
     help="The pretrained model to use",
     )
 
@@ -35,6 +57,13 @@ def parse_args():
     "--epochs",
     type=int,
     default=3,
+    help="The number of epochs.",
+    )
+
+    parser.add_argument(
+    "--debug",
+    type=bool,
+    default=False,
     help="The number of epochs.",
     )
 
@@ -119,14 +148,18 @@ def main(args):
         "epochs": EPOCHS,
         "batch_size": BATCH_SIZE
     }
-    wandb.init(project="csqa_test", entity="sondrewo", config=config)
+
+    if args.debug == False:
+        wandb.init(project="csqa_test", entity="sondrewo", config=config)
+
     train_dataset = CSQADataset("train", MODEL_NAME)
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     val_dataset = CSQADataset("validation", MODEL_NAME)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    model = AutoModelForMultipleChoice.from_pretrained(MODEL_NAME, num_labels=5).to(device)
+    #model = AutoModelForMultipleChoice.from_pretrained(MODEL_NAME, num_labels=5).to(device)
+    model = FusionModel(MODEL_NAME, 5).to(device)
     criterion = CrossEntropyLoss()
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
@@ -145,12 +178,13 @@ def main(args):
             y = torch.LongTensor(y)
             optimizer.zero_grad()
             input_ids, attention_masks, y = input_ids.to(device), attention_masks.to(device), y.to(device)
-            y_hat = model(input_ids, attention_masks).logits
+            y_hat = model(input_ids, attention_masks)
             loss = criterion(y_hat, y)
             train_loss += loss.item()
             wandb.log({"batch_loss_train": loss})
             loss.backward()
             optimizer.step()
+            break
 
         model.eval()
         with torch.no_grad():
@@ -162,12 +196,14 @@ def main(args):
                 attention_masks = attention_masks.to(device)
                 y = torch.LongTensor(y)
                 y = y.to(device)
-                out = model(input_ids=input_ids, attention_mask=attention_masks, return_dict=True).logits
+                out = model(input_ids=input_ids, attention_mask=attention_masks)
+                y_hat = nn.Softmax(out)
                 y_hat = (torch.argmax(out, dim=1))
                 correct += (y_hat == y).float().sum()
                 loss = criterion(out, y)
                 val_loss += loss.item()
                 n += 1*BATCH_SIZE
+                break
 
             accuracy = correct / n
 
