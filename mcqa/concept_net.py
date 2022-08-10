@@ -7,7 +7,7 @@ from typing import List
 
 
 result = pipeline(
-    dataset='ConceptNet',
+    dataset='DB100K',
     model='PairRE',
     # Training configuration
     training_kwargs=dict(
@@ -19,4 +19,4 @@ result = pipeline(
     device='gpu',
 )
 
-pipeline_result.save_to_directory('graph')
+result.save_to_directory('graph')
