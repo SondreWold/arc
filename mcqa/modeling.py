@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from transformers import AutoModel, AutoTokenizer
-import stanza
+
 
 def fetch_graph_embedding(hidden_size):
     return torch.rand(hidden_size)
@@ -17,6 +17,7 @@ class FusionModel(nn.Module):
         self.use_graph = use_graph
 
         if self.use_graph:
+            import stanza
             self.tokenizer = AutoTokenizer.from_pretrained(model_name)
             self.ner_tagger = stanza.Pipeline(lang='en', processors='tokenize,ner')
 
