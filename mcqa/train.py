@@ -25,6 +25,13 @@ def parse_args():
     default=16,
     help="The batch size to use during training.",
     )
+    
+    parser.add_argument(
+    "--weight_decay",
+    type=int,
+    default=1e-4,
+    help="The batch size to use during training.",
+    )
 
     parser.add_argument(
     "--model",
@@ -89,7 +96,7 @@ def main(args):
     }
 
     if args.debug == False:
-        wandb.init(project="csqa_test", entity="sondrewo", config=config)
+        wandb.init(project="multiple_choice", entity="sondrewo", config=config)
 
     train_dataset = CSQADataset(DATASET_NAME, "train", MODEL_NAME)
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
@@ -99,14 +106,13 @@ def main(args):
 
     model = FusionModel(MODEL_NAME).to(device)
     criterion = CrossEntropyLoss()
-    no_decay = ["bias", "LayerNorm.weight"]
-    optimizer_grouped_parameters = [
-        {
-            "params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
-            "weight_decay": 0.001,
-        },
+
+    no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
+    grouped_parameters = [
+        {'params': [p for n, p in model.encoder.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': args.weight_decay},
+        {'params': [p for n, p in model.encoder.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0},
     ]
-    optimizer = AdamW(optimizer_grouped_parameters, lr=LR)
+    optimizer = AdamW(grouped_parameters, lr=LR)
 
     for epoch in range(EPOCHS):
         logging.info(f"Staring training at epoch {epoch}")

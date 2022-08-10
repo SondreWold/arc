@@ -18,11 +18,7 @@ class CSQADataset(Dataset):
         self.label_indexer = {v:k for k,v in enumerate(options)}
         self.label_inverter = {k:v for k,v in enumerate(options)}
         self.labels = [self.label_indexer[x] for x in self.dataset["answerKey"]]
-        
-        #self.my_pykeen_model = torch.load('trained_model.pkl')
 
-
-    
     def __len__(self):
         return len(self.dataset)
 
@@ -49,12 +45,6 @@ class CSQADataset(Dataset):
         tokenized_examples = self.tokenizer(q_flat, c_flat, truncation=True, padding="max_length", max_length=128)
         unflatten =  {k: [v[i : i + n_choices] for i in range(0, len(v), n_choices)] for k, v in tokenized_examples.items()}
 
-        '''
-        for ele in unflatten["input_ids"]:
-            for qa_context in ele:
-                dec = tokenizer.decode(qa_context)
-                print(dec)
-        '''
         return unflatten
 
     def __getitem__(self, idx):

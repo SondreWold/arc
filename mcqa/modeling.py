@@ -11,8 +11,9 @@ class FusionModel(nn.Module):
     def __init__(self, model_name: str, use_graph=False):
         super().__init__()
         self.encoder = AutoModel.from_pretrained(model_name, return_dict=True, output_hidden_states=True, output_attentions=True)
+        self.hidden_size = self.encoder.config.to_dict()['hidden_size']
         self.dropout = nn.Dropout()
-        self.head = nn.Linear(768, 1)
+        self.head = nn.Linear(hidden_size, 1)
         self.use_graph = use_graph
 
         if self.use_graph:
@@ -21,7 +22,6 @@ class FusionModel(nn.Module):
 
     def forward(self, input_ids, attention_mask):
         batch_size, n_choices, seq_length = input_ids.size()[0], input_ids.size()[1], input_ids.size()[-1]
-        hidden_size = 768
 
         if self.use_graph:
             graph_embeddings = []
@@ -32,9 +32,9 @@ class FusionModel(nn.Module):
                     doc = self.ner_tagger(text)
                     entities = [ent.text for ent in doc.ents]
                     if entities:
-                        local_embedding.append(fetch_graph_embedding(hidden_size)) # add graph rep of all mentioned entities
+                        local_embedding.append(fetch_graph_embedding(self.hidden_size)) # add graph rep of all mentioned entities
                     else:
-                        local_embedding.append(torch.ones(hidden_size))
+                        local_embedding.append(torch.ones(self.hidden_size))
                     break #only consider first one.
                 if local_embedding:
                     neighbourhood = None
