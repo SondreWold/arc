@@ -1,0 +1,5 @@
+venv/*
+wandb/*
+*/wandb/*
+/data/
+.DS_store
