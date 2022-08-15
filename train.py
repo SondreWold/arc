@@ -109,13 +109,13 @@ def main(args):
     if args.debug == False:
         wandb.init(project="multiple_choice", entity="sondrewo", config=config)
 
-    train_dataset = CSQADataset(DATASET_NAME, "train", MODEL_NAME)
+    train_dataset = CSQADataset(DATASET_NAME, "train", MODEL_NAME, use_graph=args.use_graph)
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    val_dataset = CSQADataset(DATASET_NAME, "validation", MODEL_NAME)
+    val_dataset = CSQADataset(DATASET_NAME, "validation", MODEL_NAME, use_graph=args.use_graph)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    model = FusionModel(MODEL_NAME, device=device, use_graph=args.use_graph).to(device)
+    model = FusionModel(MODEL_NAME, device=device).to(device)
     criterion = CrossEntropyLoss()
 
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
