@@ -64,7 +64,7 @@ def parse_args():
     parser.add_argument(
     "--use_graph",
     type=bool,
-    default=True,
+    default=False,
     help="Use the graph parser",
     )
 

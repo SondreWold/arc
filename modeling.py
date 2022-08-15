@@ -13,7 +13,7 @@ def fetch_graph_embedding(hidden_size):
 
 class FusionModel(nn.Module):
 
-    def __init__(self, model_name: str, device, use_graph=True):
+    def __init__(self, model_name: str, device, use_graph):
         super().__init__()
         self.encoder = AutoModel.from_pretrained(model_name, return_dict=True, output_hidden_states=True, output_attentions=True)
         self.hidden_size = 768
@@ -21,9 +21,10 @@ class FusionModel(nn.Module):
         self.head = nn.Linear(self.hidden_size, 1)
         self.use_graph = use_graph
         self.device = device
-        self.scorer = SentenceTransformer('all-MiniLM-L6-v2')
 
         if self.use_graph:
+            print("Graph mode activated...")
+            self.scorer = SentenceTransformer('all-MiniLM-L6-v2')
             self.PG = PathRetriever("./data/conceptnet/")
             self.tokenizer = AutoTokenizer.from_pretrained(model_name)
             #self.ner_tagger = stanza.Pipeline(lang='en', processors='tokenize,ner')
