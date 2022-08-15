@@ -78,18 +78,16 @@ class FusionModel(nn.Module):
                 best_paths.append(ids[1:]) #Ignore CLS
                 best_paths_attention_masks.append(ats[1:]) #Ignore CLS
 
-        
+            tmp_i = [[x] * n_choices for x in best_paths]
+            tmp_a = [[x] * n_choices for x in best_paths_attention_masks]
 
-        tmp_i = [[x] * n_choices for x in best_paths]
-        tmp_a = [[x] * n_choices for x in best_paths_attention_masks]
+            path_representations_i = torch.LongTensor(tmp_i).to(self.device)
+            path_representations_a = torch.LongTensor(tmp_a).to(self.device)
 
-        path_representations_i = torch.LongTensor(tmp_i).to(self.device)
-        path_representations_a = torch.LongTensor(tmp_a).to(self.device)
+            input_ids = torch.cat((input_ids,path_representations_i), dim=-1)
+            attention_mask = torch.cat((attention_mask,path_representations_a), dim=-1)
 
-        input_ids = torch.cat((input_ids,path_representations_i), dim=-1)
-        attention_mask = torch.cat((attention_mask,path_representations_a), dim=-1)
-
-        seq_length  = seq_length*2
+            seq_length  = seq_length*2
 
         input_ids = input_ids.view(-1, seq_length) # Transform (batch, n_choices, seq_length) to (batch*n_choices, seq_length)
         attention_mask = attention_mask.view(-1, seq_length)# Transform (batch, n_choices, seq_length) to (batch*n_choices, seq_length)
