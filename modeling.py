@@ -13,13 +13,14 @@ def fetch_graph_embedding(hidden_size):
 
 class FusionModel(nn.Module):
 
-    def __init__(self, model_name: str, use_graph=True):
+    def __init__(self, model_name: str, device, use_graph=True):
         super().__init__()
         self.encoder = AutoModel.from_pretrained(model_name, return_dict=True, output_hidden_states=True, output_attentions=True)
         self.hidden_size = 768
         self.dropout = nn.Dropout(0.2)
         self.head = nn.Linear(self.hidden_size, 1)
         self.use_graph = use_graph
+        self.device = device
         self.scorer = SentenceTransformer('all-MiniLM-L6-v2')
 
         if self.use_graph:
@@ -79,12 +80,11 @@ class FusionModel(nn.Module):
 
         
 
-        tmp_i = [[x] * batch_size for x in best_paths]
-        tmp_a = [[x] * batch_size for x in best_paths_attention_masks]
+        tmp_i = [[x] * n_choices for x in best_paths]
+        tmp_a = [[x] * n_choices for x in best_paths_attention_masks]
 
-        path_representations_i = torch.LongTensor(tmp_i)
-        path_representations_a = torch.LongTensor(tmp_a)
-
+        path_representations_i = torch.LongTensor(tmp_i).to(self.device)
+        path_representations_a = torch.LongTensor(tmp_a).to(self.device)
 
         input_ids = torch.cat((input_ids,path_representations_i), dim=-1)
         attention_mask = torch.cat((attention_mask,path_representations_a), dim=-1)

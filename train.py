@@ -58,7 +58,14 @@ def parse_args():
     "--debug",
     type=bool,
     default=False,
-    help="The number of epochs.",
+    help="Trigger debug mode",
+    )
+
+    parser.add_argument(
+    "--use_graph",
+    type=bool,
+    default=True,
+    help="Use the graph parser",
     )
 
     parser.add_argument(
@@ -108,7 +115,7 @@ def main(args):
     val_dataset = CSQADataset(DATASET_NAME, "validation", MODEL_NAME)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    model = FusionModel(MODEL_NAME).to(device)
+    model = FusionModel(MODEL_NAME, device=device, use_graph=args.use_graph).to(device)
     criterion = CrossEntropyLoss()
 
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
