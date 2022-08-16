@@ -13,7 +13,7 @@ from modeling import FusionModel
 from CSQADataset import CSQADataset
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-torch.backends.cuda.matmul.allow_tf32 = True #Fox only (RTX3090 and A100)
+torch.backends.cuda.matmul.allow_tf32 = True #Fox only (RTX3090 and A100 GPU)
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -94,7 +94,7 @@ def main(args):
     DATASET_NAME = args.dataset
     assert DATASET_NAME in ["openbookqa", "commonsense_qa"]
 
-    logging.info(f"Initializing model with id \"{MODEL_NAME}\" for dataset {DATASET_NAME} and hyperparameters epochs={EPOCHS}, batch size={BATCH_SIZE}, lr={LR}")
+    logging.info(f"Initializing model with id \"{MODEL_NAME}\" for dataset {DATASET_NAME} and hyperparameters epochs={EPOCHS}, batch size={BATCH_SIZE}, lr={LR}, use graph mode: {args.use_graph}")
 
     config = {
         "learning_rate": LR,

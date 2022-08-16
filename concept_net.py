@@ -18,8 +18,7 @@ import logging
 from random import sample
 import matplotlib.pyplot as plt
 
-# Building on the work by https://github.com/wangpf3/Commonsense-Path-Generator/blob/main/learning-generator/sample_path_rw.py
-
+# Partially building on the work by https://github.com/wangpf3/Commonsense-Path-Generator/blob/main/learning-generator/sample_path_rw.py
 
 def parse_args():
     parser = argparse.ArgumentParser(

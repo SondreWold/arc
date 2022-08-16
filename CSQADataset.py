@@ -36,7 +36,10 @@ class CSQADataset(Dataset):
 
 
     def find_best_path(self, question, options):
-
+        '''
+            Finds paths between concepts indentified in the quesition and the answer candidates.
+            Each path is scored against the original QA context using cosine similarity using SentenceTransformer.
+        '''
         answers_tmp = options
         q_words = []
         answer_words = []
@@ -50,7 +53,6 @@ class CSQADataset(Dataset):
             answer_words.append(a_tmp)
 
         paths = []
-
         top_score = 0.0
         best_path = ""
 
@@ -78,7 +80,7 @@ class CSQADataset(Dataset):
             options = examples["choices"]["text"]
             best_path = self.find_best_path(question, options)
             questions = []
-            q = [examples[question_key] + "" + best_path for i in range(n_choices)]
+            q = [examples[question_key] + " " + best_path for i in range(n_choices)]
             questions.append(q)
             choices = []
             choices.append(examples["choices"]["text"])
