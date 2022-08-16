@@ -102,7 +102,8 @@ def main(args):
         "batch_size": BATCH_SIZE,
         "weight_decay": args.weight_decay,
         "dataset": DATASET_NAME,
-        "model_name": MODEL_NAME
+        "model_name": MODEL_NAME,
+        "uses_graph": args.use_graph
 
     }
 
