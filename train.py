@@ -13,7 +13,7 @@ from modeling import FusionModel
 from CSQADataset import CSQADataset
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-torch.backends.cuda.matmul.allow_tf32 = True #Fox only (RTX3090 and A100)
+torch.backends.cuda.matmul.allow_tf32 = True #Fox only (RTX3090 and A100 GPU)
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -94,7 +94,7 @@ def main(args):
     DATASET_NAME = args.dataset
     assert DATASET_NAME in ["openbookqa", "commonsense_qa"]
 
-    logging.info(f"Initializing model with id \"{MODEL_NAME}\" for dataset {DATASET_NAME} and hyperparameters epochs={EPOCHS}, batch size={BATCH_SIZE}, lr={LR}")
+    logging.info(f"Initializing model with id \"{MODEL_NAME}\" for dataset {DATASET_NAME} and hyperparameters epochs={EPOCHS}, batch size={BATCH_SIZE}, lr={LR}, use graph mode: {args.use_graph}")
 
     config = {
         "learning_rate": LR,
@@ -102,20 +102,21 @@ def main(args):
         "batch_size": BATCH_SIZE,
         "weight_decay": args.weight_decay,
         "dataset": DATASET_NAME,
-        "model_name": MODEL_NAME
+        "model_name": MODEL_NAME,
+        "uses_graph": args.use_graph
 
     }
 
     if args.debug == False:
         wandb.init(project="multiple_choice", entity="sondrewo", config=config)
 
-    train_dataset = CSQADataset(DATASET_NAME, "train", MODEL_NAME)
+    train_dataset = CSQADataset(DATASET_NAME, "train", MODEL_NAME, use_graph=args.use_graph)
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    val_dataset = CSQADataset(DATASET_NAME, "validation", MODEL_NAME)
+    val_dataset = CSQADataset(DATASET_NAME, "validation", MODEL_NAME, use_graph=args.use_graph)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-    model = FusionModel(MODEL_NAME, device=device, use_graph=args.use_graph).to(device)
+    model = FusionModel(MODEL_NAME, device=device).to(device)
     criterion = CrossEntropyLoss()
 
     no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
